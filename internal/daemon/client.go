@@ -191,6 +191,12 @@ func executeServiceCommand(name, command string) error {
 		return cmdErr
 	}
 
-	fmt.Printf("Service '%s' %sed successfully\n", name, command)
+	// Use proper past tense for each command
+	pastTense := map[string]string{
+		"start":   "started",
+		"stop":    "stopped",
+		"restart": "restarted",
+	}
+	fmt.Printf("Service '%s' %s successfully\n", name, pastTense[command])
 	return nil
 }

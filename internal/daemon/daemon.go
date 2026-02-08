@@ -21,6 +21,7 @@ type Daemon struct {
 	containerMgr   *container.Manager
 	ctx            context.Context
 	cancel         context.CancelFunc
+	restartCooldown map[string]time.Time
 }
 
 // New creates a new daemon instance
@@ -54,11 +55,12 @@ func New() (*Daemon, error) {
 	serviceMgr := service.NewManager(st, containerMgr)
 
 	return &Daemon{
-		state:          st,
-		serviceManager: serviceMgr,
-		containerMgr:   containerMgr,
-		ctx:            ctx,
-		cancel:         cancel,
+		state:           st,
+		serviceManager:  serviceMgr,
+		containerMgr:    containerMgr,
+		ctx:             ctx,
+		cancel:          cancel,
+		restartCooldown: make(map[string]time.Time),
 	}, nil
 }
 
@@ -125,9 +127,19 @@ func (d *Daemon) healthCheckLoop() {
 				if svc.Status == "running" {
 					healthy, err := d.serviceManager.HealthCheck(d.ctx, svc.Name)
 					if err != nil || !healthy {
+						// Check if service is in cooldown period
+						if lastRestart, exists := d.restartCooldown[svc.Name]; exists {
+							if time.Since(lastRestart) < 2*time.Minute {
+								fmt.Printf("Service %s is in cooldown, skipping restart\n", svc.Name)
+								continue
+							}
+						}
+
 						fmt.Printf("Service %s is unhealthy, attempting restart...\n", svc.Name)
 						if err := d.serviceManager.Restart(d.ctx, svc.Name); err != nil {
 							fmt.Printf("Failed to restart service %s: %v\n", svc.Name, err)
+						} else {
+							d.restartCooldown[svc.Name] = time.Now()
 						}
 					}
 				}

@@ -123,7 +123,10 @@ func (p *PostgresProvider) Delete(ctx context.Context, svc *state.Service) error
 	}
 
 	// Remove data directory
-	homeDir, _ := os.UserHomeDir()
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("failed to get home directory: %w", err)
+	}
 	dataDir := filepath.Join(homeDir, ".cloudless", "data", svc.Name)
 	if err := os.RemoveAll(dataDir); err != nil {
 		return fmt.Errorf("failed to remove data directory: %w", err)
