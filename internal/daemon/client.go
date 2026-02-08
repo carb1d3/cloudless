@@ -47,7 +47,7 @@ func CreateService(serviceType, name string) error {
 
 	fmt.Printf("Service '%s' created successfully\n", name)
 	fmt.Printf("Type: %s\n", serviceType)
-	
+
 	// Get connection info
 	svc, err := st.GetService(name)
 	if err == nil && svc.Status == "running" {
@@ -174,7 +174,7 @@ func executeServiceCommand(name, command string) error {
 	serviceMgr := service.NewManager(st, containerMgr)
 
 	ctx := context.Background()
-	
+
 	var cmdErr error
 	switch command {
 	case "start":

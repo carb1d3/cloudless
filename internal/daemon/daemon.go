@@ -16,11 +16,11 @@ import (
 
 // Daemon represents the main Cloudless daemon
 type Daemon struct {
-	state          *state.State
-	serviceManager *service.Manager
-	containerMgr   *container.Manager
-	ctx            context.Context
-	cancel         context.CancelFunc
+	state           *state.State
+	serviceManager  *service.Manager
+	containerMgr    *container.Manager
+	ctx             context.Context
+	cancel          context.CancelFunc
 	restartCooldown map[string]time.Time
 }
 
