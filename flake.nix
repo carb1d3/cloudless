@@ -53,7 +53,6 @@
           shellHook = ''
             echo "☁️  Entering Cloudless dev shell"
             echo "Go version: $(go version 2>/dev/null || echo not found)"
-            echo "Rust version: $(rustc --version 2>/dev/null || echo not found)"
           '';
         };
       });
